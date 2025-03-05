@@ -144,28 +144,33 @@ class EmployeeCard extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: Colors.indigoAccent,
-              child: Text('E${index + 1}',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: FittedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text('E${index + 1}',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
             ),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
+                  Flexible(
                     child: Text('Employee ${index + 1}',
                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
+                        maxLines: 1,
+                        softWrap: false),
                   ),
                   SizedBox(height: 4),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
+                  Flexible(
                     child: Text('Position: Manager',
-                        style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: false),
                   ),
                 ],
               ),
