@@ -11,8 +11,8 @@ class TeamSyncApp extends StatelessWidget {
       title: 'TeamSync',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.grey[100],
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: Colors.grey[200],
         textTheme: TextTheme(
           titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
           bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
@@ -30,14 +30,11 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('TeamSync Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_none, size: 28),
-            onPressed: () {},
-          ),
+          IconButton(icon: Icon(Icons.notifications_none, size: 28), onPressed: () {}),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: CircleAvatar(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Colors.indigoAccent,
               child: Icon(Icons.person, color: Colors.white),
             ),
           ),
@@ -57,24 +54,19 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Employee List', style: Theme.of(context).textTheme.titleLarge), // FIXED
+                      Text('Employee List', style: Theme.of(context).textTheme.titleLarge),
                       SizedBox(height: 10),
                       Expanded(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            int crossAxisCount = isWideScreen ? 3 : 1;
-                            return GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: 3.8,
-                              ),
-                              itemCount: 12,
-                              itemBuilder: (context, index) {
-                                return EmployeeCard(index: index);
-                              },
-                            );
+                        child: GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: isWideScreen ? 3 : 1,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 3.5,
+                          ),
+                          itemCount: 12,
+                          itemBuilder: (context, index) {
+                            return EmployeeCard(index: index);
                           },
                         ),
                       ),
@@ -100,15 +92,20 @@ class ResponsiveDrawer extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('TeamSync', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 6),
-                Text('Manage your team efficiently', style: TextStyle(color: Colors.white70, fontSize: 14)),
-              ],
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.indigo, Colors.blueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Center(
+              child: Text('TeamSync',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  )),
             ),
           ),
           _drawerItem(icon: Icons.dashboard, text: 'Dashboard', onTap: () {}),
@@ -124,7 +121,7 @@ class ResponsiveDrawer extends StatelessWidget {
 
   ListTile _drawerItem({required IconData icon, required String text, required VoidCallback onTap}) {
     return ListTile(
-      leading: Icon(icon, color: Colors.blueAccent),
+      leading: Icon(icon, color: Colors.indigoAccent),
       title: Text(text, style: TextStyle(fontSize: 16)),
       onTap: onTap,
     );
@@ -146,17 +143,30 @@ class EmployeeCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: Colors.blueAccent,
-              child: Text('E${index + 1}', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              backgroundColor: Colors.indigoAccent,
+              child: Text('E${index + 1}',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Employee ${index + 1}', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text('Employee ${index + 1}',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
+                  ),
                   SizedBox(height: 4),
-                  Text('Position: Manager', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text('Position: Manager',
+                        style: TextStyle(fontSize: 14, color: Colors.black54)),
+                  ),
                 ],
               ),
             ),
