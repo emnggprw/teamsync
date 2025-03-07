@@ -35,52 +35,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('TeamSync Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(icon: Icon(Icons.notifications_none, size: 28), onPressed: () {}),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.indigoAccent,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
+      body: Row(
+        children: [
+          NavigationPanel(
+            selectedMenu: _selectedMenu,
+            onMenuSelected: (menu) => setState(() => _selectedMenu = menu),
+          ),
+          Expanded(
+            child: _buildContent(),
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.indigo),
-              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
-            ),
-            ListTile(
-              title: Text('Dashboard'),
-              onTap: () {
-                setState(() => _selectedMenu = "Dashboard");
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Employee List'),
-              onTap: () {
-                setState(() => _selectedMenu = "Employees");
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Schedule'),
-              onTap: () {
-                setState(() => _selectedMenu = "Schedule");
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      body: _buildContent(),
     );
   }
 
@@ -95,6 +60,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Text('Welcome to TeamSync', style: Theme.of(context).textTheme.titleLarge),
         );
     }
+  }
+}
+
+class NavigationPanel extends StatelessWidget {
+  final String selectedMenu;
+  final Function(String) onMenuSelected;
+
+  NavigationPanel({required this.selectedMenu, required this.onMenuSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 250,
+      color: Colors.indigo,
+      child: Column(
+        children: [
+          DrawerHeader(
+            child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+          ),
+          ListTile(
+            title: Text('Dashboard', style: TextStyle(color: Colors.white)),
+            onTap: () => onMenuSelected("Dashboard"),
+          ),
+          ListTile(
+            title: Text('Employee List', style: TextStyle(color: Colors.white)),
+            onTap: () => onMenuSelected("Employees"),
+          ),
+          ListTile(
+            title: Text('Schedule', style: TextStyle(color: Colors.white)),
+            onTap: () => onMenuSelected("Schedule"),
+          ),
+        ],
+      ),
+    );
   }
 }
 
