@@ -31,67 +31,74 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   String _selectedMenu = "Dashboard";
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+    bool isLargeScreen = MediaQuery.of(context).size.width > 800;
+
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: !isLargeScreen ? Drawer(child: _buildSideMenu()) : null,
       body: Row(
         children: [
-          NavigationPanel(
-            selectedMenu: _selectedMenu,
-            onMenuSelected: (menu) => setState(() => _selectedMenu = menu),
-          ),
-          Expanded(
-            child: _buildContent(),
-          ),
+          if (isLargeScreen)
+            SizedBox(
+              width: 250,
+              child: _buildSideMenu(),
+            ),
+          Expanded(child: _buildContent(isLargeScreen)),
         ],
+      ),
+      appBar: isLargeScreen
+          ? null
+          : AppBar(
+        title: Text("TeamSync"),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
       ),
     );
   }
 
-  Widget _buildContent() {
-    switch (_selectedMenu) {
-      case "Employees":
-        return EmployeeSearchScreen();
-      case "Schedule":
-        return ScheduleScreen();
-      default:
-        return Center(
-          child: Text('Welcome to TeamSync', style: Theme.of(context).textTheme.titleLarge),
-        );
-    }
+  Widget _buildSideMenu() {
+    return Drawer(
+      child: Container(
+        color: Colors.indigo,
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            _buildMenuItem("Dashboard"),
+            _buildMenuItem("Employees"),
+            _buildMenuItem("Schedule"),
+          ],
+        ),
+      ),
+    );
   }
-}
 
-class NavigationPanel extends StatelessWidget {
-  final String selectedMenu;
-  final Function(String) onMenuSelected;
+  Widget _buildMenuItem(String title) {
+    return ListTile(
+      title: Text(title, style: TextStyle(color: Colors.white)),
+      onTap: () {
+        setState(() => _selectedMenu = title);
+        if (MediaQuery.of(context).size.width < 800) Navigator.pop(context);
+      },
+    );
+  }
 
-  NavigationPanel({required this.selectedMenu, required this.onMenuSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 250,
-      color: Colors.indigo,
-      child: Column(
-        children: [
-          DrawerHeader(
-            child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
-          ),
-          ListTile(
-            title: Text('Dashboard', style: TextStyle(color: Colors.white)),
-            onTap: () => onMenuSelected("Dashboard"),
-          ),
-          ListTile(
-            title: Text('Employee List', style: TextStyle(color: Colors.white)),
-            onTap: () => onMenuSelected("Employees"),
-          ),
-          ListTile(
-            title: Text('Schedule', style: TextStyle(color: Colors.white)),
-            onTap: () => onMenuSelected("Schedule"),
-          ),
-        ],
+  Widget _buildContent(bool isLargeScreen) {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: Center(
+        child: _selectedMenu == "Employees"
+            ? EmployeeSearchScreen()
+            : _selectedMenu == "Schedule"
+            ? ScheduleScreen()
+            : Text('Welcome to TeamSync', style: Theme.of(context).textTheme.titleLarge),
       ),
     );
   }
@@ -123,36 +130,33 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Employee List', style: Theme.of(context).textTheme.titleLarge),
-          SizedBox(height: 10),
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              labelText: 'Search Employee',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: _filterEmployees,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Employee List', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            labelText: 'Search Employee',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredEmployees.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(filteredEmployees[index]),
-                  leading: CircleAvatar(child: Text(filteredEmployees[index].split(' ')[1])),
-                );
-              },
-            ),
+          onChanged: _filterEmployees,
+        ),
+        SizedBox(height: 10),
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredEmployees.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(filteredEmployees[index]),
+                leading: CircleAvatar(child: Text(filteredEmployees[index].split(' ')[1])),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -160,22 +164,19 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
 class ScheduleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Schedule', style: Theme.of(context).textTheme.titleLarge),
-          SizedBox(height: 10),
-          Expanded(
-            child: TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: DateTime.now(),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Schedule', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        Expanded(
+          child: TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: DateTime.now(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
