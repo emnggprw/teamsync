@@ -65,11 +65,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildSideMenu() {
     return Drawer(
       child: Container(
-        color: Colors.indigo,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.indigo.shade900, Colors.indigo.shade600],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Column(
           children: [
             DrawerHeader(
-              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
             ),
             _buildMenuItem("Dashboard"),
             _buildMenuItem("Employees"),
@@ -82,7 +88,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildMenuItem(String title) {
     return ListTile(
-      title: Text(title, style: TextStyle(color: Colors.white)),
+      title: Text(title, style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
+      hoverColor: Colors.white24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onTap: () {
         setState(() => _selectedMenu = title);
         if (MediaQuery.of(context).size.width < 800) Navigator.pop(context);
