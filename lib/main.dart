@@ -154,12 +154,34 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
         ),
         SizedBox(height: 10),
         Expanded(
-          child: ListView.builder(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+              childAspectRatio: 3 / 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemCount: filteredEmployees.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(filteredEmployees[index]),
-                leading: CircleAvatar(child: Text(filteredEmployees[index].split(' ')[1])),
+              return Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        child: Text(filteredEmployees[index].split(' ')[1]),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        filteredEmployees[index],
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
