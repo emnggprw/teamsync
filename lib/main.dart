@@ -119,8 +119,17 @@ class EmployeeSearchScreen extends StatefulWidget {
 
 class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
   TextEditingController _searchController = TextEditingController();
-  List<String> employees = List.generate(12, (index) => 'Employee ${index + 1}');
-  List<String> filteredEmployees = [];
+  List<Map<String, String>> employees = List.generate(
+    12,
+        (index) => {
+      'name': 'Employee ${index + 1}',
+      'position': 'Position ${index + 1}',
+      'department': 'Department ${index % 3 + 1}',
+      'email': 'employee${index + 1}@company.com',
+      'status': ['Available', 'Busy', 'On Leave'][index % 3],
+    },
+  );
+  List<Map<String, String>> filteredEmployees = [];
 
   @override
   void initState() {
@@ -131,9 +140,33 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
   void _filterEmployees(String query) {
     setState(() {
       filteredEmployees = employees
-          .where((employee) => employee.toLowerCase().contains(query.toLowerCase()))
+          .where((employee) => employee['name']!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+
+  void _showEmployeeDetails(Map<String, String> employee) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(employee['name']!),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Position: ${employee['position']!}"),
+              Text("Department: ${employee['department']!}"),
+              Text("Email: ${employee['email']!}"),
+              Text("Status: ${employee['status']!}"),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text("Close")),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -155,31 +188,23 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
         SizedBox(height: 10),
         Expanded(
           child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-              childAspectRatio: 3 / 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10),
             itemCount: filteredEmployees.length,
             itemBuilder: (context, index) {
-              return Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        child: Text(filteredEmployees[index].split(' ')[1]),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        filteredEmployees[index],
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+              return GestureDetector(
+                onTap: () => _showEmployeeDetails(filteredEmployees[index]),
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(filteredEmployees[index]['name']!, style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(filteredEmployees[index]['position']!),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -210,3 +235,4 @@ class ScheduleScreen extends StatelessWidget {
     );
   }
 }
+
