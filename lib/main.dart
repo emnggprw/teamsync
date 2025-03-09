@@ -119,7 +119,15 @@ class EmployeeSearchScreen extends StatefulWidget {
 
 class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
   TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> employees = [];
+  List<Map<String, String>> employees = List.generate(
+    12,
+        (index) => {
+      'name': 'Employee ${index + 1}',
+      'position': 'Position ${index + 1}',
+      'department': 'Department ${index % 3 + 1}',
+    },
+  );
+
   List<Map<String, String>> filteredEmployees = [];
 
   @override
@@ -136,28 +144,12 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
     });
   }
 
-  void _addEmployee(String name, String role, String email) {
-    setState(() {
-      employees.add({'name': name, 'role': role, 'email': email});
-      filteredEmployees = employees;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Employee List', style: Theme.of(context).textTheme.titleLarge),
-            FloatingActionButton(
-              onPressed: () => _showAddEmployeeDialog(),
-              child: Icon(Icons.add),
-            ),
-          ],
-        ),
+        Text('Employee List', style: Theme.of(context).textTheme.titleLarge),
         SizedBox(height: 10),
         TextField(
           controller: _searchController,
@@ -170,15 +162,31 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
         ),
         SizedBox(height: 10),
         Expanded(
-          child: ListView.builder(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 3),
             itemCount: filteredEmployees.length,
             itemBuilder: (context, index) {
-              var employee = filteredEmployees[index];
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  title: Text(employee['name']!),
-                  subtitle: Text('${employee['role']} - ${employee['email']}'),
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EmployeeProfileScreen(employee: filteredEmployees[index]),
+                  ),
+                ),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(filteredEmployees[index]['name']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(filteredEmployees[index]['position']!),
+                        Text(filteredEmployees[index]['department']!),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
@@ -187,37 +195,26 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
       ],
     );
   }
+}
 
-  void _showAddEmployeeDialog() {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController roleController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
+class EmployeeProfileScreen extends StatelessWidget {
+  final Map<String, String> employee;
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add Employee'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+  EmployeeProfileScreen({required this.employee});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(employee['name']!)),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Name')),
-            TextField(controller: roleController, decoration: InputDecoration(labelText: 'Role')),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
+            Text('Position: ${employee['position']}', style: TextStyle(fontSize: 18)),
+            Text('Department: ${employee['department']}', style: TextStyle(fontSize: 18)),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _addEmployee(nameController.text, roleController.text, emailController.text);
-              Navigator.pop(context);
-            },
-            child: Text('Add'),
-          ),
-        ],
       ),
     );
   }
@@ -226,6 +223,19 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
 class ScheduleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Schedule Screen'));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Schedule', style: Theme.of(context).textTheme.titleLarge),
+        SizedBox(height: 10),
+        Expanded(
+          child: TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: DateTime.now(),
+          ),
+        ),
+      ],
+    );
   }
 }
