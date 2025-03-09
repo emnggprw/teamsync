@@ -119,16 +119,8 @@ class EmployeeSearchScreen extends StatefulWidget {
 
 class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
   TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> employees = List.generate(
-    12,
-        (index) => {
-      'name': 'Employee ${index + 1}',
-      'position': 'Position ${index + 1}',
-      'department': 'Department ${index % 3 + 1}',
-    },
-  );
-
-  List<Map<String, String>> filteredEmployees = [];
+  List<String> employees = List.generate(12, (index) => 'Employee ${index + 1}');
+  List<String> filteredEmployees = [];
 
   @override
   void initState() {
@@ -139,7 +131,7 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
   void _filterEmployees(String query) {
     setState(() {
       filteredEmployees = employees
-          .where((employee) => employee['name']!.toLowerCase().contains(query.toLowerCase()))
+          .where((employee) => employee.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -162,31 +154,23 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
         ),
         SizedBox(height: 10),
         Expanded(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 3),
+          child: ListView.builder(
             itemCount: filteredEmployees.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EmployeeProfileScreen(employee: filteredEmployees[index]),
-                  ),
-                ),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(filteredEmployees[index]['name']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text(filteredEmployees[index]['position']!),
-                        Text(filteredEmployees[index]['department']!),
-                      ],
-                    ),
-                  ),
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(filteredEmployees[index]),
+                  leading: CircleAvatar(child: Text(filteredEmployees[index].split(' ')[1])),
+                  trailing: Icon(Icons.arrow_forward),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EmployeeProfileScreen(name: filteredEmployees[index]),
+                      ),
+                    );
+                  },
                 ),
               );
             },
@@ -198,27 +182,49 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
 }
 
 class EmployeeProfileScreen extends StatelessWidget {
-  final Map<String, String> employee;
+  final String name;
 
-  EmployeeProfileScreen({required this.employee});
+  EmployeeProfileScreen({required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(employee['name']!)),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Position: ${employee['position']}', style: TextStyle(fontSize: 18)),
-            Text('Department: ${employee['department']}', style: TextStyle(fontSize: 18)),
-          ],
+      appBar: AppBar(title: Text('$name Profile')),
+      body: Center(
+        child: Card(
+          margin: EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 5,
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
+                SizedBox(height: 10),
+                Text(name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                SizedBox(height: 5),
+                Text("Position: Software Engineer", style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+                SizedBox(height: 10),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.email),
+                  title: Text("Email: $name@example.com"),
+                ),
+                ListTile(
+                  leading: Icon(Icons.phone),
+                  title: Text("Phone: +123456789"),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
+
 
 class ScheduleScreen extends StatelessWidget {
   @override
