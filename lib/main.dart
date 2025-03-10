@@ -216,10 +216,26 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
           child: ListView.builder(
             itemCount: filteredEmployees.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(filteredEmployees[index]),
-                leading: CircleAvatar(child: Text(filteredEmployees[index].split(' ')[1])),
+              return GestureDetector(
                 onTap: () => _navigateToProfile(filteredEmployees[index]),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(16),
+                    leading: CircleAvatar(
+                      child: Text(filteredEmployees[index][0]),
+                    ),
+                    title: Text(
+                      filteredEmployees[index],
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                  ),
+                ),
               );
             },
           ),
@@ -227,20 +243,76 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
       ],
     );
   }
+
 }
 
 class EmployeeProfileScreen extends StatelessWidget {
   final String employeeName;
-  const EmployeeProfileScreen({required this.employeeName});
+  const EmployeeProfileScreen({required this.employeeName, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(employeeName)),
-      body: Center(child: Text('Profile of $employeeName')),
+      appBar: AppBar(
+        // title: Text(employeeName),
+        // centerTitle: true,
+        // elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 60,
+              child: Text(
+                employeeName[0],
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              employeeName,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Software Engineer',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+            SizedBox(height: 16),
+            Divider(thickness: 1),
+            SizedBox(height: 16),
+            _buildInfoTile(Icons.email, 'Email', 'employee@example.com'),
+            _buildInfoTile(Icons.phone, 'Phone', '+1 234 567 890'),
+            _buildInfoTile(Icons.location_on, 'Address', '123 Main Street, City'),
+            _buildInfoTile(Icons.work, 'Department', 'Technology'),
+            SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.message),
+              label: Text('Send Message'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile(IconData icon, String title, String value) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.blueAccent),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(value),
+      contentPadding: EdgeInsets.symmetric(vertical: 4),
     );
   }
 }
+
 
 
 class ScheduleScreen extends StatelessWidget {
