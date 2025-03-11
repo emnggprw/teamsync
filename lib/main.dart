@@ -252,72 +252,133 @@ class _EmployeeSearchScreenState extends State<EmployeeSearchScreen> {
 
 }
 
+
 class EmployeeProfileScreen extends StatelessWidget {
   final String employeeName;
   const EmployeeProfileScreen({required this.employeeName, super.key});
 
   @override
   Widget build(BuildContext context) {
+    bool isLargeScreen = MediaQuery.of(context).size.width > 800;
+
     return Scaffold(
       appBar: AppBar(
-        // title: Text(employeeName),
-        // centerTitle: true,
-        // elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        elevation: 8,
+        backgroundColor: Colors.indigo.shade700,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 60,
-              child: Text(
-                employeeName[0],
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-              ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 700),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: isLargeScreen ? 90 : 70,
+                  backgroundColor: Colors.indigo.shade100,
+                  child: Text(
+                    employeeName[0],
+                    style: TextStyle(
+                      fontSize: isLargeScreen ? 70 : 50,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.indigo.shade800,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+                Text(
+                  employeeName,
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 30 : 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo.shade900,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Software Engineer',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.teal.shade600,
+                  ),
+                ),
+                SizedBox(height: 28),
+                Divider(thickness: 2, color: Colors.indigo.shade200),
+                SizedBox(height: 28),
+                _buildInfoTile(Icons.email_outlined, 'Email', 'employee@example.com'),
+                _buildInfoTile(Icons.phone_outlined, 'Phone', '+1 234 567 890'),
+                _buildInfoTile(Icons.location_on_outlined, 'Address', '123 Main Street, City'),
+                _buildInfoTile(Icons.work_outline, 'Department', 'Technology'),
+                SizedBox(height: 36),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.message_outlined, size: 22),
+                  label: Text(
+                    'Send Message',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    backgroundColor: Colors.indigo.shade700,
+                    foregroundColor: Colors.white,
+                    elevation: 8,
+                    shadowColor: Colors.tealAccent,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              employeeName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Software Engineer',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 16),
-            Divider(thickness: 1),
-            SizedBox(height: 16),
-            _buildInfoTile(Icons.email, 'Email', 'employee@example.com'),
-            _buildInfoTile(Icons.phone, 'Phone', '+1 234 567 890'),
-            _buildInfoTile(Icons.location_on, 'Address', '123 Main Street, City'),
-            _buildInfoTile(Icons.work, 'Department', 'Technology'),
-            SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.message),
-              label: Text('Send Message'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildInfoTile(IconData icon, String title, String value) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blueAccent),
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(value),
-      contentPadding: EdgeInsets.symmetric(vertical: 4),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.teal.shade50,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: Colors.teal.shade700, size: 26),
+          ),
+          SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.indigo.shade900),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
 
 
 
