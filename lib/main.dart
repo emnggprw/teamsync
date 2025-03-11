@@ -133,29 +133,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildStatCard('Employees', totalEmployees, Icons.people),
-            _buildStatCard('Schedules', upcomingSchedules, Icons.schedule),
-            _buildStatCard('Pending Tasks', pendingTasks, Icons.pending_actions),
+            _buildStatCard('Employees', totalEmployees, Icons.people, Colors.blue),
+            _buildStatCard('Schedules', upcomingSchedules, Icons.schedule, Colors.green),
+            _buildStatCard('Pending Tasks', pendingTasks, Icons.pending_actions, Colors.red),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildStatCard(String title, int count, IconData icon) {
+  Widget _buildStatCard(String title, int count, IconData icon, Color color) {
     return Expanded(
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 6,
+        shadowColor: color.withOpacity(0.5),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 40, color: Colors.indigo),
-              SizedBox(height: 10),
-              Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 5),
-              Text(count.toString(), style: TextStyle(fontSize: 24, color: Colors.indigo)),
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: color.withOpacity(0.2),
+                child: Icon(icon, size: 40, color: color),
+              ),
+              SizedBox(height: 15),
+              Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis)),
+              SizedBox(height: 8),
+              Text(count.toString(), style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: color)),
             ],
           ),
         ),
