@@ -6,50 +6,55 @@ class ScheduleScreen extends StatefulWidget {
   _ScheduleScreenState createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProviderStateMixin {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   Map<DateTime, List<String>> _events = {};
+  final _controller = TextEditingController();
 
-  List<String> _getEventsForDay(DateTime day) {
-    return _events[day] ?? [];
-  }
+  List<String> _getEventsForDay(DateTime day) => _events[day] ?? [];
 
-  void _addEvent(DateTime day, String event) {
-    if (_events[day] != null) {
-      _events[day]!.add(event);
-    } else {
-      _events[day] = [event];
+  void _addEvent(String event) {
+    if (event.isNotEmpty && _selectedDay != null) {
+      setState(() {
+        _events[_selectedDay!] = [...?_events[_selectedDay!], event];
+      });
     }
-    setState(() {});
   }
 
-  void _showAddEventDialog() {
-    String newEvent = '';
+  void _showEventModal({String? initialText}) {
+    _controller.text = initialText ?? '';
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Add Event', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             TextField(
-              decoration: InputDecoration(labelText: 'Event Title'),
-              onChanged: (value) => newEvent = value,
+              controller: _controller,
+              style: TextStyle(fontSize: 18),
+              decoration: InputDecoration(
+                hintText: 'Event Title',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                if (newEvent.isNotEmpty && _selectedDay != null) {
-                  _addEvent(_selectedDay!, newEvent);
-                  Navigator.pop(context);
-                }
+                _addEvent(_controller.text);
+                Navigator.pop(context);
               },
-              child: Text('Save Event'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: Colors.indigo,
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              child: Text('Save Event', style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ],
         ),
@@ -60,60 +65,81 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Schedule')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
+      appBar: AppBar(
+        title: Text('Schedule', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            SizedBox(height: kToolbarHeight + 20),
+            TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) => setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
-              });
-            },
-            calendarStyle: CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: Colors.blueAccent,
-                shape: BoxShape.circle,
-              ),
-              selectedDecoration: BoxDecoration(
-                color: Colors.deepPurpleAccent,
-                shape: BoxShape.circle,
-              ),
-              markerDecoration: BoxDecoration(
-                color: Colors.orangeAccent,
-                shape: BoxShape.circle,
-              ),
-            ),
-            eventLoader: _getEventsForDay,
-          ),
-          SizedBox(height: 10),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(8),
-              children: _getEventsForDay(_selectedDay ?? _focusedDay)
-                  .map((event) => Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                child: ListTile(
-                  title: Text(event),
-                  trailing: Icon(Icons.edit),
-                  onTap: _showAddEventDialog,
+              }),
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  shape: BoxShape.circle,
                 ),
-              ))
-                  .toList(),
+                selectedDecoration: BoxDecoration(
+                  color: Colors.indigo,
+                  shape: BoxShape.circle,
+                ),
+                markerDecoration: BoxDecoration(
+                  color: Colors.amber,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              eventLoader: _getEventsForDay,
             ),
-          ),
-        ],
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                children: _getEventsForDay(_selectedDay ?? _focusedDay)
+                    .map((event) => Dismissible(
+                  key: ValueKey(event),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (_) => setState(() => _events[_selectedDay!]!.remove(event)),
+                  background: Container(
+                    padding: EdgeInsets.only(right: 20),
+                    alignment: Alignment.centerRight,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  child: Card(
+                    elevation: 3,
+                    shadowColor: Colors.grey.withOpacity(0.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: ListTile(
+                      title: Text(event, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87)),
+                      trailing: Icon(Icons.edit, color: Colors.indigo),
+                      onTap: () => _showEventModal(initialText: event),
+                    ),
+                  ),
+                ))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddEventDialog,
-        child: Icon(Icons.add),
-        backgroundColor: Colors.deepPurpleAccent,
+        onPressed: () => _showEventModal(),
+        backgroundColor: Colors.indigo,
+        child: Icon(Icons.add, size: 28),
       ),
     );
   }
