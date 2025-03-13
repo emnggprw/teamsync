@@ -9,54 +9,116 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProviderStateMixin {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<String>> _events = {};
-  final _controller = TextEditingController();
+  Map<DateTime, List<Map<String, dynamic>>> _events = {};
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _locationController = TextEditingController();
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay.now().replacing(hour: TimeOfDay.now().hour + 1);
+  Color _selectedColor = Colors.blue;
 
-  List<String> _getEventsForDay(DateTime day) => _events[day] ?? [];
+  List<Map<String, dynamic>> _getEventsForDay(DateTime day) => _events[day] ?? [];
 
-  void _addEvent(String event) {
-    if (event.isNotEmpty && _selectedDay != null) {
+  void _addEvent() {
+    if (_titleController.text.isNotEmpty && _selectedDay != null) {
       setState(() {
-        _events[_selectedDay!] = [...?_events[_selectedDay!], event];
+        _events[_selectedDay!] = [
+          ...?_events[_selectedDay!],
+          {
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'location': _locationController.text,
+            'startTime': _startTime,
+            'endTime': _endTime,
+            'color': _selectedColor,
+          },
+        ];
       });
     }
   }
 
-  void _showEventModal({String? initialText}) {
-    _controller.text = initialText ?? '';
+  Future<void> _selectTime(BuildContext context, bool isStartTime) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: isStartTime ? _startTime : _endTime,
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStartTime) {
+          _startTime = picked;
+        } else {
+          _endTime = picked;
+        }
+      });
+    }
+  }
+
+  void _showEventModal() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
       builder: (context) => Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _controller,
-              style: TextStyle(fontSize: 18),
-              decoration: InputDecoration(
-                hintText: 'Event Title',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(labelText: 'Event Title'),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                _addEvent(_controller.text);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                backgroundColor: Colors.indigo,
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
               ),
-              child: Text('Save Event', style: TextStyle(fontSize: 16, color: Colors.white)),
-            ),
-          ],
+              TextField(
+                controller: _locationController,
+                decoration: InputDecoration(labelText: 'Location'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () => _selectTime(context, true),
+                    child: Text('Start: ${_startTime.format(context)}'),
+                  ),
+                  TextButton(
+                    onPressed: () => _selectTime(context, false),
+                    child: Text('End: ${_endTime.format(context)}'),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Color:'),
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedColor = Colors.blue),
+                    child: CircleAvatar(backgroundColor: Colors.blue),
+                  ),
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedColor = Colors.red),
+                    child: CircleAvatar(backgroundColor: Colors.red),
+                  ),
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedColor = Colors.green),
+                    child: CircleAvatar(backgroundColor: Colors.green),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _addEvent();
+                  Navigator.pop(context);
+                },
+                child: Text('Save Event'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -66,80 +128,40 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Schedule', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black)),
-        centerTitle: true,
+        title: Text('Schedule'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      extendBodyBehindAppBar: true,
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            SizedBox(height: kToolbarHeight + 20),
-            TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) => setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              }),
-              calendarStyle: CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
+      body: Column(
+        children: [
+          TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) => setState(() {
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
+            }),
+            eventLoader: _getEventsForDay,
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.all(16),
+              children: _getEventsForDay(_selectedDay ?? _focusedDay).map((event) => Card(
+                child: ListTile(
+                  leading: CircleAvatar(backgroundColor: event['color']),
+                  title: Text(event['title']),
+                  subtitle: Text('${event['startTime'].format(context)} - ${event['endTime'].format(context)}\n${event['location']}'),
                 ),
-                selectedDecoration: BoxDecoration(
-                  color: Colors.indigo,
-                  shape: BoxShape.circle,
-                ),
-                markerDecoration: BoxDecoration(
-                  color: Colors.amber,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              eventLoader: _getEventsForDay,
+              )).toList(),
             ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                children: _getEventsForDay(_selectedDay ?? _focusedDay)
-                    .map((event) => Dismissible(
-                  key: ValueKey(event),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (_) => setState(() => _events[_selectedDay!]!.remove(event)),
-                  background: Container(
-                    padding: EdgeInsets.only(right: 20),
-                    alignment: Alignment.centerRight,
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.delete, color: Colors.white),
-                  ),
-                  child: Card(
-                    elevation: 3,
-                    shadowColor: Colors.grey.withOpacity(0.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      title: Text(event, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87)),
-                      trailing: Icon(Icons.edit, color: Colors.indigo),
-                      onTap: () => _showEventModal(initialText: event),
-                    ),
-                  ),
-                ))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEventModal(),
-        backgroundColor: Colors.indigo,
-        child: Icon(Icons.add, size: 28),
+        onPressed: _showEventModal,
+        child: Icon(Icons.add),
       ),
     );
   }
