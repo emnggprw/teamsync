@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/dashboard_screen.dart';
 import 'theme_provider.dart';
+import 'screens/dashboard_screen.dart';
 
 class TeamSyncApp extends StatelessWidget {
   const TeamSyncApp({super.key});

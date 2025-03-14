@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme_provider.dart';  // Adjust the path if necessary
+import '../theme_provider.dart';  // Correct import path
 
 class SettingsScreen extends StatelessWidget {
   @override
