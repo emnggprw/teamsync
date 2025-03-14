@@ -18,6 +18,7 @@ class SideMenu extends StatelessWidget {
           _buildMenuItem(context, "Dashboard"),
           _buildMenuItem(context, "Employees"),
           _buildMenuItem(context, "Schedule"),
+          _buildMenuItem(context, "Settings"),
         ],
       ),
     );

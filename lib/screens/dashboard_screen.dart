@@ -5,6 +5,7 @@ import '../widgets/custom_appbar.dart';
 import 'employee_search_screen.dart';
 import 'schedule_screen.dart';
 import 'package:intl/intl.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -45,11 +46,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: _selectedMenu == "Employees"
             ? EmployeeSearchScreen()
             : _selectedMenu == "Schedule"
-            ?  ScheduleScreen()
+            ? ScheduleScreen()
+            : _selectedMenu == "Settings"
+            ? Builder(
+          builder: (context) => SettingsScreen(),
+        )
             : _buildDashboard(),
       ),
     );
   }
+
 
   Widget _buildDashboard() {
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
