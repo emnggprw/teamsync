@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme_provider.dart';  // Correct import path
+import '../theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -11,19 +11,67 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Settings'),
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Dark Mode'),
-            Switch(
+        children: [
+          _buildSettingsOption(
+            context,
+            title: 'Dark Mode',
+            trailing: Switch(
               value: themeProvider.themeMode == ThemeMode.dark,
               onChanged: (value) => themeProvider.toggleTheme(value),
             ),
-          ],
-        ),
+          ),
+          const Divider(),
+          _buildSettingsOption(
+            context,
+            title: 'Notifications',
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // Navigate to Notifications Settings
+            },
+          ),
+          const Divider(),
+          _buildSettingsOption(
+            context,
+            title: 'Account',
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // Navigate to Account Settings
+            },
+          ),
+          const Divider(),
+          _buildSettingsOption(
+            context,
+            title: 'Privacy & Security',
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // Navigate to Privacy Settings
+            },
+          ),
+          const Divider(),
+          _buildSettingsOption(
+            context,
+            title: 'Help & Support',
+            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // Navigate to Help Section
+            },
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildSettingsOption(BuildContext context, {
+    required String title,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      title: Text(title),
+      trailing: trailing,
+      onTap: onTap,
     );
   }
 }
