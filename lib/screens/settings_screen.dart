@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -54,10 +56,16 @@ class SettingsScreen extends StatelessWidget {
             context,
             title: 'Help & Support',
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navigate to Help Section
+            onTap: () async {
+              const url = 'https://github.com/emnggprw/teamsync';
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
             },
           ),
+
         ],
       ),
     );
