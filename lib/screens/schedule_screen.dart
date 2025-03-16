@@ -14,7 +14,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   TimeOfDay _startTime = TimeOfDay.now();
-  TimeOfDay _endTime = TimeOfDay.now().replacing(hour: TimeOfDay.now().hour + 1);
+  TimeOfDay _endTime = TimeOfDay.now().replacing(hour: (TimeOfDay.now().hour + 1) % 24);
+
   Color _selectedColor = Colors.blue;
 
   List<Map<String, dynamic>> _getEventsForDay(DateTime day) => _events[day] ?? [];
