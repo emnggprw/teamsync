@@ -29,8 +29,13 @@ class SettingsScreen extends StatelessWidget {
             context,
             title: 'Notifications',
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navigate to Notifications Settings
+            onTap: () async {
+              const url = 'https://github.com/emnggprw/teamsync';
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
             },
           ),
           const Divider(),
@@ -38,8 +43,13 @@ class SettingsScreen extends StatelessWidget {
             context,
             title: 'Account',
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navigate to Account Settings
+            onTap: () async {
+              const url = 'https://github.com/emnggprw/teamsync';
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
             },
           ),
           const Divider(),
@@ -47,8 +57,13 @@ class SettingsScreen extends StatelessWidget {
             context,
             title: 'Privacy & Security',
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navigate to Privacy Settings
+            onTap: () async {
+              const url = 'https://github.com/emnggprw/teamsync';
+              if (await canLaunchUrl(Uri.parse(url))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
             },
           ),
           const Divider(),
