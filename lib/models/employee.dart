@@ -1,13 +1,19 @@
 class Employee {
   final String name;
-  final String position;
+  final String email;
+  final String phone;
+  final String address;
   final String department;
-  final String profileImageUrl;
+  final String position;
+  final String? profileImageUrl;
 
-  Employee({
+  const Employee({
     required this.name,
-    required this.position,
+    required this.email,
+    required this.phone,
+    required this.address,
     required this.department,
-    required this.profileImageUrl,
+    required this.position,
+    this.profileImageUrl,
   });
 }
